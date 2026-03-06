@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mono.fm</title>
+    <script>
+      (function () {
+        var path = window.location.pathname || "/";
+        var search = window.location.search || "";
+        var parts = path.split("/").filter(Boolean);
+        var known = { room: true, search: true, entry: true, loading: true };
+        var base = "";
+        var routePath = path;
+
+        if (parts.length > 1 && !known[parts[0]]) {
+          base = "/" + parts[0];
+          routePath = "/" + parts.slice(1).join("/");
+        }
+
+        var hashTarget = "#" + routePath + search;
+        var target = window.location.origin + base + "/" + hashTarget;
+        window.location.replace(target);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

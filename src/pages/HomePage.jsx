@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import { searchTracks } from '../lib/musicApi'
 import { usePlayer } from '../player/PlayerProvider'
@@ -26,6 +26,7 @@ function getDuration(track) {
 
 export default function HomePage() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { currentTrack, isPlaying, toggle, setTrack } = usePlayer()
   const [inputValue, setInputValue] = useState('ambient')
   const [queue, setQueue] = useState([])
@@ -63,7 +64,7 @@ export default function HomePage() {
     event.preventDefault()
     const query = inputValue.trim()
     if (!query) return
-    window.location.href = `/search?q=${encodeURIComponent(query)}`
+    navigate(`/search?q=${encodeURIComponent(query)}`)
   }
 
   return (
@@ -104,9 +105,9 @@ export default function HomePage() {
             <button type="button" className="room-play-btn" onClick={toggle} aria-label={isPlaying ? 'Pause' : 'Play'}>
               <span className={isPlaying ? 'icon-pause' : 'icon-play'} aria-hidden />
             </button>
-            <a href="/entry" className="change-mood-link">
+            <Link to="/entry" className="change-mood-link">
               change mood
-            </a>
+            </Link>
           </div>
 
           <p className="queue-inline">

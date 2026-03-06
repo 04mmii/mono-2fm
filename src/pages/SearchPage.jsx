@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import { searchTracks } from '../lib/musicApi'
 import { usePlayer } from '../player/PlayerProvider'
@@ -8,10 +8,12 @@ const FILTERS = ['All', 'Tracks', 'Artists', 'Albums', 'Playlists']
 
 export default function SearchPage() {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
   const player = usePlayer()
   const [activeFilter, setActiveFilter] = useState('All')
-  const [query, setQuery] = useState('ambient')
-  const [inputValue, setInputValue] = useState('ambient')
+  const initialQuery = params.get('q') || 'ambient'
+  const [query, setQuery] = useState(initialQuery)
+  const [inputValue, setInputValue] = useState(initialQuery)
   const [tracks, setTracks] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -83,7 +85,7 @@ export default function SearchPage() {
 
       <main className="search-main">
         <div className="breadcrumb">
-          <a href="/">← Back to Home</a>
+          <Link to="/room">← Back to Home</Link>
         </div>
 
         <div className="results-heading">

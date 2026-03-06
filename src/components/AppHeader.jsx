@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function AppHeader({
   variant = 'main',
   active = 'room',
@@ -10,10 +12,10 @@ export default function AppHeader({
     return (
       <div className="app-header-fixed entry">
         <header className="entry-header">
-          <a href="/entry" className="entry-brand">
+          <Link to="/entry" className="entry-brand">
             <span className="entry-radio">◉</span>
             <h2>mono.fm</h2>
-          </a>
+          </Link>
           <button type="button" className="entry-menu" aria-label="Menu">
             ≡
           </button>
@@ -26,18 +28,18 @@ export default function AppHeader({
     <div className="app-header-fixed">
       <header className={variant === 'search' ? 'search-header' : 'mono-header'} data-purpose="main-nav">
         <div className="left-nav">
-          <a href="/entry" className="brand">
+          <Link to="/entry" className="brand">
             <span className="brand-icon">◉</span>
             <h1>Mono.fm</h1>
-          </a>
+          </Link>
 
           <nav className={variant === 'search' ? 'nav-links' : 'main-nav'} aria-label="Primary">
-            <a href="/room" className={active === 'room' ? 'active' : ''}>
+            <Link to="/room" className={active === 'room' ? 'active' : ''}>
               Room
-            </a>
-            <a href="/search" className={active === 'search' ? 'active' : ''}>
+            </Link>
+            <Link to="/search" className={active === 'search' ? 'active' : ''}>
               Browse
-            </a>
+            </Link>
             <a href="#">Radio</a>
             <a href="#">Library</a>
           </nav>
