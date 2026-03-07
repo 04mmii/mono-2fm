@@ -20,7 +20,7 @@ function getTrackArtist(track) {
 }
 
 export default function MiniPlayer() {
-  const { currentTrack, isPlaying, currentTime, duration, toggle, seek } = usePlayer()
+  const { currentTrack, isPlaying, currentTime, duration, toggle, seek, playNext, playPrev, nextTrack } = usePlayer()
 
   const progress = useMemo(() => {
     if (!duration) return 0
@@ -51,13 +51,25 @@ export default function MiniPlayer() {
       </div>
 
       <div className="mini-center-controls">
-        <button type="button" className="mini-side-btn" aria-label="Previous">
+        <button
+          type="button"
+          className="mini-side-btn"
+          aria-label="Previous"
+          onClick={playPrev}
+          disabled={!currentTrack}
+        >
           <span className="icon-prev" aria-hidden />
         </button>
         <button type="button" className="mini-play-toggle" onClick={toggle} aria-label={isPlaying ? 'Pause' : 'Play'}>
           <span className={isPlaying ? 'icon-pause' : 'icon-play'} aria-hidden />
         </button>
-        <button type="button" className="mini-side-btn" aria-label="Next">
+        <button
+          type="button"
+          className="mini-side-btn"
+          aria-label="Next"
+          onClick={playNext}
+          disabled={!currentTrack}
+        >
           <span className="icon-next" aria-hidden />
         </button>
       </div>
@@ -65,7 +77,7 @@ export default function MiniPlayer() {
       <div className="mini-right">
         <span>NEXT IN QUEUE</span>
         <p>
-          {getTrackTitle(currentTrack)} — {getTrackArtist(currentTrack)}
+          {getTrackTitle(nextTrack)} — {getTrackArtist(nextTrack)}
         </p>
       </div>
     </footer>

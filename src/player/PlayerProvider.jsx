@@ -2,144 +2,309 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 const PlayerContext = createContext(null)
 
-function getAudioSrc(track) {
-  if (!track || typeof track !== 'object') return ''
+function firstText(values) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim()
+  }
+  return ''
+}
 
-  const candidates = [
+function getTrackKey(track) {
+  if (!track || typeof track !== 'object') return ''
+  return firstText([
+    track.id != null ? String(track.id) : '',
+    track.trackId != null ? String(track.trackId) : '',
     track.previewUrl,
     track.audioUrl,
     track.streamUrl,
     track.trackUrl,
     track.url,
-    track.audio?.url,
-  ]
+    track.src,
+    track.title,
+    track.name,
+    track.trackName,
+  ])
+}
 
-  const src = candidates.find((value) => typeof value === 'string' && value.length > 0)
-  return src || ''
+function sameTrack(a, b) {
+  const aKey = getTrackKey(a)
+  const bKey = getTrackKey(b)
+  if (!aKey || !bKey) return false
+  return aKey === bKey
+}
+
+export function getAudioSrc(track) {
+  if (!track || typeof track !== 'object') return ''
+  return firstText([
+    track.previewUrl,
+    track.audioUrl,
+    track.streamUrl,
+    track.trackUrl,
+    track.url,
+    track.src,
+    track.audio?.url,
+    track.attributes?.previews?.[0]?.url,
+  ])
 }
 
 export function PlayerProvider({ children }) {
   const audioRef = useRef(null)
+
   const [currentTrack, setCurrentTrackState] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [queue, setQueueState] = useState([])
+  const [currentIndex, setCurrentIndex] = useState(-1)
+
+  const setCurrentTrack = useCallback(
+    (track) => {
+      setCurrentTrackState(track || null)
+      if (!track) {
+        setCurrentIndex(-1)
+        return
+      }
+
+      setCurrentIndex((prev) => {
+        const idx = queue.findIndex((item) => sameTrack(item, track))
+        if (idx >= 0) return idx
+        return prev
+      })
+    },
+    [queue]
+  )
+
+  const setQueue = useCallback(
+    (tracks) => {
+      const nextQueue = Array.isArray(tracks) ? tracks.filter(Boolean) : []
+      setQueueState(nextQueue)
+
+      if (nextQueue.length === 0) {
+        setCurrentIndex(-1)
+        return
+      }
+
+      if (!currentTrack) {
+        setCurrentTrackState(nextQueue[0])
+        setCurrentIndex(0)
+        return
+      }
+
+      const idx = nextQueue.findIndex((item) => sameTrack(item, currentTrack))
+      setCurrentIndex(idx >= 0 ? idx : 0)
+    },
+    [currentTrack]
+  )
+
+  const play = useCallback(
+    (track) => {
+      const targetTrack = track || currentTrack || queue[Math.max(currentIndex, 0)] || null
+      if (!targetTrack) return
+
+      if (track) {
+        setCurrentTrackState(track)
+        const idx = queue.findIndex((item) => sameTrack(item, track))
+        if (idx >= 0) setCurrentIndex(idx)
+        if (idx < 0 && queue.length === 0) {
+          setQueueState([track])
+          setCurrentIndex(0)
+        }
+      }
+
+      if (!track && !currentTrack && queue.length > 0) {
+        setCurrentTrackState(queue[Math.max(currentIndex, 0)])
+      }
+
+      setIsPlaying(true)
+    },
+    [currentIndex, currentTrack, queue]
+  )
 
   const pause = useCallback(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    audio.pause()
     setIsPlaying(false)
   }, [])
 
-  const setTrack = useCallback((track) => {
-    setCurrentTrackState(track || null)
-    setCurrentTime(0)
-    setDuration(0)
-  }, [])
-
-  const play = useCallback(async (track) => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const trackToPlay = track || currentTrack
-    if (!trackToPlay) return
-
-    const nextSrc = getAudioSrc(trackToPlay)
-    if (!nextSrc) {
-      setCurrentTrackState(trackToPlay)
-      setIsPlaying(false)
-      return
-    }
-
-    if (audio.src !== nextSrc) {
-      audio.src = nextSrc
-    }
-
-    if (track) {
-      setCurrentTrackState(trackToPlay)
-      setCurrentTime(0)
-      setDuration(0)
-    }
-
-    try {
-      await audio.play()
-      setIsPlaying(true)
-    } catch {
-      setIsPlaying(false)
-    }
-  }, [currentTrack])
-
   const toggle = useCallback(() => {
-    if (isPlaying) {
-      pause()
-      return
+    if (!currentTrack && queue.length > 0) {
+      setCurrentTrackState(queue[Math.max(currentIndex, 0)])
     }
-    play()
-  }, [isPlaying, pause, play])
+    setIsPlaying((prev) => !prev)
+  }, [currentIndex, currentTrack, queue])
 
   const seek = useCallback((time) => {
     const audio = audioRef.current
-    if (!audio || Number.isNaN(time)) return
-    const clamped = Math.max(0, Math.min(time, Number.isFinite(duration) ? duration : time))
-    audio.currentTime = clamped
-    setCurrentTime(clamped)
-  }, [duration])
+    if (!audio) return
+    const nextTime = Number(time)
+    if (!Number.isFinite(nextTime)) return
+    audio.currentTime = Math.max(0, nextTime)
+    setCurrentTime(audio.currentTime || 0)
+  }, [])
+
+  const playNext = useCallback(() => {
+    if (queue.length === 0) return
+
+    const baseIndex =
+      currentIndex >= 0
+        ? currentIndex
+        : queue.findIndex((item) => sameTrack(item, currentTrack))
+    const nextIndex = baseIndex >= 0 ? (baseIndex + 1) % queue.length : 0
+    const next = queue[nextIndex]
+    if (!next) return
+
+    setCurrentTrackState(next)
+    setCurrentIndex(nextIndex)
+  }, [currentIndex, currentTrack, queue])
+
+  const playPrev = useCallback(() => {
+    if (queue.length === 0) return
+
+    const baseIndex =
+      currentIndex >= 0
+        ? currentIndex
+        : queue.findIndex((item) => sameTrack(item, currentTrack))
+    const prevIndex = baseIndex >= 0 ? (baseIndex - 1 + queue.length) % queue.length : queue.length - 1
+    const prev = queue[prevIndex]
+    if (!prev) return
+
+    setCurrentTrackState(prev)
+    setCurrentIndex(prevIndex)
+  }, [currentIndex, currentTrack, queue])
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
 
-    const onTime = () => setCurrentTime(audio.currentTime || 0)
-    const onLoaded = () => setDuration(audio.duration || 0)
-    const onEnded = () => setIsPlaying(false)
-    const onPause = () => setIsPlaying(false)
-    const onPlay = () => setIsPlaying(true)
-
-    audio.addEventListener('timeupdate', onTime)
-    audio.addEventListener('loadedmetadata', onLoaded)
-    audio.addEventListener('ended', onEnded)
-    audio.addEventListener('pause', onPause)
-    audio.addEventListener('play', onPlay)
-
-    return () => {
-      audio.removeEventListener('timeupdate', onTime)
-      audio.removeEventListener('loadedmetadata', onLoaded)
-      audio.removeEventListener('ended', onEnded)
-      audio.removeEventListener('pause', onPause)
-      audio.removeEventListener('play', onPlay)
+    const src = getAudioSrc(currentTrack)
+    if (!src) {
+      audio.pause()
+      audio.removeAttribute('src')
+      audio.load()
+      setCurrentTime(0)
+      setDuration(0)
+      if (isPlaying) setIsPlaying(false)
+      return
     }
-  }, [])
+
+    if (audio.getAttribute('src') !== src) {
+      audio.setAttribute('src', src)
+      audio.load()
+      setCurrentTime(0)
+    }
+
+    if (isPlaying) {
+      const playPromise = audio.play()
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {
+          setIsPlaying(false)
+        })
+      }
+    } else {
+      audio.pause()
+    }
+  }, [currentTrack, isPlaying])
 
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio || !currentTrack) return
+    if (!audio) return
 
-    const nextSrc = getAudioSrc(currentTrack)
-    if (!nextSrc) return
-    if (audio.src !== nextSrc) {
-      audio.src = nextSrc
-      audio.load()
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime || 0)
     }
-  }, [currentTrack])
 
-  const value = useMemo(() => ({
-    currentTrack,
-    isPlaying,
-    currentTime,
-    duration,
-    play,
-    pause,
-    toggle,
-    seek,
-    setTrack,
-    getAudioSrc,
-  }), [currentTime, currentTrack, duration, isPlaying, pause, play, seek, setTrack, toggle])
+    const handleDurationChange = () => {
+      const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0
+      setDuration(nextDuration)
+    }
+
+    const handleEnded = () => {
+      if (queue.length > 1) {
+        const baseIndex =
+          currentIndex >= 0
+            ? currentIndex
+            : queue.findIndex((item) => sameTrack(item, currentTrack))
+        const nextIndex = baseIndex >= 0 ? (baseIndex + 1) % queue.length : 0
+        const next = queue[nextIndex]
+        if (next) {
+          setCurrentTrackState(next)
+          setCurrentIndex(nextIndex)
+          setIsPlaying(true)
+          return
+        }
+      }
+      setIsPlaying(false)
+    }
+
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('durationchange', handleDurationChange)
+    audio.addEventListener('loadedmetadata', handleDurationChange)
+    audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('durationchange', handleDurationChange)
+      audio.removeEventListener('loadedmetadata', handleDurationChange)
+      audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+    }
+  }, [currentIndex, currentTrack, queue])
+
+  const nextTrack = useMemo(() => {
+    if (!queue.length) return null
+    const baseIndex =
+      currentIndex >= 0
+        ? currentIndex
+        : queue.findIndex((item) => sameTrack(item, currentTrack))
+    if (baseIndex < 0) return queue[0] || null
+    return queue[(baseIndex + 1) % queue.length] || null
+  }, [currentIndex, currentTrack, queue])
+
+  const value = useMemo(
+    () => ({
+      currentTrack,
+      isPlaying,
+      currentTime,
+      duration,
+      queue,
+      currentIndex,
+      nextTrack,
+      play,
+      pause,
+      toggle,
+      seek,
+      setTrack: setCurrentTrack,
+      setQueue,
+      playNext,
+      playPrev,
+    }),
+    [
+      currentTrack,
+      isPlaying,
+      currentTime,
+      duration,
+      queue,
+      currentIndex,
+      nextTrack,
+      play,
+      pause,
+      toggle,
+      seek,
+      setCurrentTrack,
+      setQueue,
+      playNext,
+      playPrev,
+    ]
+  )
 
   return (
     <PlayerContext.Provider value={value}>
       {children}
-      <audio ref={audioRef} preload="metadata" />
+      <audio ref={audioRef} preload="metadata" style={{ display: 'none' }} />
     </PlayerContext.Provider>
   )
 }

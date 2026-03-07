@@ -15,17 +15,18 @@ function LoadingPage() {
 
 function AppShell() {
   const location = useLocation()
-  const hideMiniPlayer = location.pathname === '/entry' || location.pathname === '/loading'
+  const hideMiniPlayer =
+    location.pathname === '/' || location.pathname === '/entry' || location.pathname === '/loading'
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<EntryPage />} />
         <Route path="/room" element={<HomePage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/entry" element={<EntryPage />} />
         <Route path="/loading" element={<LoadingPage />} />
-        <Route path="*" element={<Navigate to="/room" replace />} />
+        <Route path="*" element={<Navigate to="/entry" replace />} />
       </Routes>
       {!hideMiniPlayer ? <MiniPlayer /> : null}
     </>

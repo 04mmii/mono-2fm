@@ -5,20 +5,18 @@ export default function AppHeader({
   active = 'room',
   showSearch = false,
   searchValue = '',
+  searchPlaceholder = '어떤 장면을 틀어드릴까요?',
   onSearchChange,
   onSearchSubmit,
 }) {
   if (variant === 'entry') {
     return (
       <div className="app-header-fixed entry">
-        <header className="entry-header">
-          <Link to="/entry" className="entry-brand">
-            <span className="entry-radio">◉</span>
-            <h2>mono.fm</h2>
+        <header className="mono-header entry-only" data-purpose="main-nav">
+          <Link to="/entry" className="brand">
+            <span className="brand-icon">◉</span>
+            <h1>Mono.fm</h1>
           </Link>
-          <button type="button" className="entry-menu" aria-label="Menu">
-            ≡
-          </button>
         </header>
       </div>
     )
@@ -26,7 +24,7 @@ export default function AppHeader({
 
   return (
     <div className="app-header-fixed">
-      <header className={variant === 'search' ? 'search-header' : 'mono-header'} data-purpose="main-nav">
+      <header className="mono-header" data-purpose="main-nav">
         <div className="left-nav">
           <Link to="/entry" className="brand">
             <span className="brand-icon">◉</span>
@@ -53,7 +51,7 @@ export default function AppHeader({
                 type="text"
                 value={searchValue}
                 onChange={onSearchChange}
-                placeholder="Search music..."
+                placeholder={searchPlaceholder}
                 aria-label="Search music"
               />
             </form>

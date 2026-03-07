@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import { searchTracks } from '../lib/musicApi'
@@ -27,12 +27,13 @@ function getDuration(track) {
 export default function HomePage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { currentTrack, isPlaying, toggle, setTrack } = usePlayer()
+  const { currentTrack, isPlaying, toggle, setTrack, setQueue, queue, nextTrack } = usePlayer()
   const [inputValue, setInputValue] = useState('ambient')
-  const [queue, setQueue] = useState([])
   const mood = location.state?.mood || 'ambient calm'
 
   useEffect(() => {
+    if (queue.length > 0) return
+
     let active = true
     const load = async () => {
       try {
@@ -51,19 +52,15 @@ export default function HomePage() {
     return () => {
       active = false
     }
-  }, [currentTrack, setTrack])
-
-  const nextTrack = useMemo(() => {
-    if (!currentTrack || queue.length === 0) return null
-    const idx = queue.findIndex((item) => item.id === currentTrack.id)
-    if (idx < 0) return queue[0] || null
-    return queue[(idx + 1) % queue.length]
-  }, [currentTrack, queue])
+  }, [currentTrack, queue.length, setQueue, setTrack])
 
   const onSubmitSearch = (event) => {
     event.preventDefault()
     const query = inputValue.trim()
-    if (!query) return
+    if (!query) {
+      navigate('/search')
+      return
+    }
     navigate(`/search?q=${encodeURIComponent(query)}`)
   }
 
@@ -80,6 +77,7 @@ export default function HomePage() {
         active="room"
         showSearch
         searchValue={inputValue}
+        searchPlaceholder="어떤 장면을 틀어드릴까요?"
         onSearchChange={(e) => setInputValue(e.target.value)}
         onSearchSubmit={onSubmitSearch}
       />
