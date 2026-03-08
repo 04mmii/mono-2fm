@@ -77,7 +77,7 @@ export default function HomePage() {
         active="room"
         showSearch
         searchValue={inputValue}
-        searchPlaceholder="어떤 장면을 틀어드릴까요?"
+        searchPlaceholder="오늘, 어떤 온도의 음악을 들을까요?"
         onSearchChange={(e) => setInputValue(e.target.value)}
         onSearchSubmit={onSubmitSearch}
       />

@@ -74,17 +74,24 @@ export default function EntryPage() {
         <AppHeader variant="entry" />
 
         <main className="entry-main">
-          <div className="entry-content">
-            <h1>choose your analog mood</h1>
-            <p>warm analog aesthetic • premium sound</p>
-            <div className="entry-moods">
-              {MOODS.map((mood) => (
-                <button key={mood} type="button" className="mood-button" onClick={() => enterRoom(mood)}>
-                  {mood}
-                </button>
-              ))}
+          <section className="entry-hero" aria-label="Mood selection hero">
+            <div className="entry-content">
+              <p className="entry-kicker">MONO.FM LISTENING ROOM</p>
+              <h1>How do you feel right now?</h1>
+              <p className="entry-subtitle">A quiet moment before the music begins.</p>
             </div>
-          </div>
+
+            <div className="entry-mood-panel">
+              <p className="entry-mood-caption">Choose a mood</p>
+              <div className="entry-moods" role="list" aria-label="Mood options">
+                {MOODS.map((mood) => (
+                  <button key={mood} type="button" className="mood-button" onClick={() => enterRoom(mood)}>
+                    <span className="mood-title">{mood}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
         </main>
 
         <footer className="entry-footer">
