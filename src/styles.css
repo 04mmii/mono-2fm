@@ -1204,72 +1204,6 @@ body {
   color: rgb(124 116 104 / 70%);
 }
 
-.entry-moods {
-  width: min(100%, 460px);
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.mood-button {
-  width: 100%;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 0.62rem 0.2rem 0.62rem 0.1rem;
-  border: 0;
-  border-bottom: 1px solid rgb(166 139 130 / 24%);
-  background: transparent;
-  color: var(--text-muted);
-  text-transform: none;
-  font-family: "Inter", system-ui, sans-serif;
-  font-size: 0.86rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: none;
-  transition:
-    color 220ms ease,
-    border-color 220ms ease,
-    background-color 220ms ease;
-}
-
-.mood-button:first-child {
-  border-top: 1px solid rgb(166 139 130 / 24%);
-}
-
-.mood-title {
-  text-align: center;
-  color: inherit;
-  transition: color 220ms ease;
-}
-
-.mood-button:hover {
-  background: rgb(244 241 232 / 16%);
-  border-color: rgb(159 147 128 / 40%);
-  color: rgb(47 42 36 / 90%);
-}
-
-.mood-button:hover .mood-title {
-  color: rgb(47 42 36 / 90%);
-}
-
-.mood-button:focus-visible {
-  outline: none;
-  border-color: rgb(159 147 128 / 56%);
-  color: var(--text-main);
-  background: rgb(244 241 232 / 22%);
-}
-
-.mood-button:focus-visible .mood-arrow {
-  opacity: 1;
-  transform: translateX(0);
-}
-
 /* Tuning dial — the 5 moods laid out as radio stops with a travelling needle. */
 .entry-dial {
   width: 100%;
@@ -1549,15 +1483,6 @@ body {
     width: min(100%, 460px);
     margin-top: 1.35rem;
     padding: 0;
-  }
-
-  .entry-moods {
-    width: min(100%, 440px);
-  }
-
-  .mood-button {
-    min-height: 48px;
-    padding: 0.5rem 0.2rem 0.5rem 0.1rem;
   }
 
   .dial-mood {
