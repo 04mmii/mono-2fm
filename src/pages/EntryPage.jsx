@@ -78,11 +78,13 @@ export default function EntryPage() {
             <div className="entry-content">
               <p className="entry-kicker">MONO.FM LISTENING ROOM</p>
               <h1>How do you feel right now?</h1>
-              <p className="entry-subtitle">A quiet moment before the music begins.</p>
+              <p className="entry-subtitle">
+                지금의 기분을 건네주세요. AI 큐레이터가 어울리는 옛 음악을 찾아 턴테이블에 올려둘게요.
+              </p>
             </div>
 
             <div className="entry-mood-panel">
-              <p className="entry-mood-caption">Choose a mood</p>
+              <p className="entry-mood-caption">Tell the AI your mood</p>
               <div className="entry-moods" role="list" aria-label="Mood options">
                 {MOODS.map((mood) => (
                   <button key={mood} type="button" className="mood-button" onClick={() => enterRoom(mood)}>
