@@ -258,6 +258,34 @@ body {
   font-weight: 300;
 }
 
+.artist-name--with-note {
+  margin-bottom: 0.9rem;
+}
+
+.ai-note {
+  margin: 0 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 44ch;
+}
+
+.ai-playlist-mood {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+.ai-reason {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .meta-row {
   display: flex;
   align-items: center;
@@ -867,8 +895,9 @@ body {
 
 .mini-player {
   position: fixed;
-  left: 16px;
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1440px, calc(100% - 64px));
   bottom: 0;
   z-index: 8;
   display: flex;
@@ -1545,8 +1574,7 @@ body {
   }
 
   .mini-player {
-    left: 8px;
-    right: 8px;
+    width: min(1440px, calc(100% - 36px));
     flex-wrap: wrap;
     justify-content: center;
   }

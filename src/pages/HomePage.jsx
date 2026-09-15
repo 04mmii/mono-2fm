@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import { searchTracks } from '../lib/musicApi'
 import { usePlayer } from '../player/PlayerProvider'
+
+const FALLBACK_QUERY = 'city pop 1980s'
 
 function getTitle(track) {
   return track?.title || track?.name || track?.trackName || 'No track selected'
@@ -27,32 +29,69 @@ function getDuration(track) {
 export default function HomePage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { currentTrack, isPlaying, toggle, setTrack, setQueue, queue, nextTrack } = usePlayer()
+  const { currentTrack, isPlaying, toggle, setTrack, setQueue, nextTrack } = usePlayer()
   const [inputValue, setInputValue] = useState('ambient')
+  const [curation, setCuration] = useState(null)
+  const [isCurating, setIsCurating] = useState(true)
   const mood = location.state?.mood || 'ambient calm'
 
+  // setQueue/setTrack은 호출할 때마다 identity가 바뀌므로,
+  // 같은 무드에 대해서는 effect 본문이 다시 돌지 않도록 막는다.
+  const loadedMoodRef = useRef(null)
+
   useEffect(() => {
-    if (queue.length > 0) return
+    if (loadedMoodRef.current === mood) return
+    loadedMoodRef.current = mood
 
     let active = true
+    setIsCurating(true)
+
     const load = async () => {
+      let query = FALLBACK_QUERY
+      let note = null
+
+      // 1. Claude가 무드를 읽고 레트로 검색어를 만들어준다.
       try {
-        const data = await searchTracks('ambient', 12)
+        const res = await fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mood }),
+        })
+        if (!res.ok) throw new Error(`Recommend failed (${res.status})`)
+        const data = await res.json()
+        if (data?.query) query = data.query
+        if (data?.reason || data?.playlistMood) {
+          note = { reason: data.reason || '', playlistMood: data.playlistMood || '' }
+        }
+      } catch {
+        // AI 호출이 실패해도 레트로 기본 검색어로 재생은 이어간다.
+        query = FALLBACK_QUERY
+      }
+
+      if (!active) return
+      setCuration(note)
+
+      // 2. 검색은 기존대로 iTunes Search API를 그대로 쓴다.
+      try {
+        const tracks = await searchTracks(query, 12)
         if (!active) return
-        setQueue(data)
-        if (!currentTrack && data.length > 0) {
-          setTrack(data[0])
+        setQueue(tracks)
+        if (tracks.length > 0) {
+          setTrack(tracks[0])
         }
       } catch {
         if (!active) return
         setQueue([])
+      } finally {
+        if (active) setIsCurating(false)
       }
     }
+
     load()
     return () => {
       active = false
     }
-  }, [currentTrack, queue.length, setQueue, setTrack])
+  }, [mood, setQueue, setTrack])
 
   const onSubmitSearch = (event) => {
     event.preventDefault()
@@ -85,8 +124,21 @@ export default function HomePage() {
       <main className="hero room-hero" data-purpose="hero-content">
         <section className="track-info" data-purpose="track-info">
           <p className="track-number">today&apos;s mood: {mood}</p>
-          <h2 className="track-title">{getTitle(currentTrack)}</h2>
-          <p className="artist-name">by {getArtist(currentTrack)}</p>
+          <h2 className="track-title">
+            {isCurating ? 'Curating a retro mix…' : getTitle(currentTrack)}
+          </h2>
+          <p className={curation ? 'artist-name artist-name--with-note' : 'artist-name'}>
+            by {getArtist(currentTrack)}
+          </p>
+
+          {curation && (
+            <div className="ai-note">
+              {curation.playlistMood && (
+                <p className="ai-playlist-mood">{curation.playlistMood}</p>
+              )}
+              {curation.reason && <p className="ai-reason">{curation.reason}</p>}
+            </div>
+          )}
 
           <div className="meta-row">
             <div>
