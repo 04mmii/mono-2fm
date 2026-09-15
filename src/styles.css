@@ -1129,7 +1129,7 @@ body {
 }
 
 .entry-hero {
-  width: min(760px, 100%);
+  width: min(1040px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1183,15 +1183,15 @@ body {
   margin: 0 auto;
   max-width: 520px;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   line-height: 1.72;
   letter-spacing: 0.015em;
   text-transform: none;
 }
 
 .entry-mood-panel {
-  width: min(100%, 520px);
-  margin-top: 7.05rem;
+  width: min(100%, 1000px);
+  margin-top: 4.75rem;
   padding: 0;
 }
 
@@ -1268,6 +1268,143 @@ body {
 .mood-button:focus-visible .mood-arrow {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* Tuning dial — the 5 moods laid out as radio stops with a travelling needle. */
+.entry-dial {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.entry-dial-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+}
+
+.dial-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.56rem;
+  padding: 0.62rem 0.38rem 1rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.dial-mood-name {
+  white-space: nowrap;
+  font-size: 0.86rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  transition:
+    color 240ms ease,
+    font-size 240ms ease;
+}
+
+.dial-mood.is-active .dial-mood-name {
+  font-size: 1rem;
+  color: rgb(47 42 36 / 90%);
+}
+
+.dial-mood-hint {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.58rem;
+  color: rgb(124 116 104 / 72%);
+  opacity: 0.3;
+  transition: opacity 260ms ease;
+}
+
+.dial-mood.is-active .dial-mood-hint {
+  opacity: 1;
+}
+
+.entry-ruler {
+  position: relative;
+  height: 26px;
+  margin-top: 0.25rem;
+}
+
+.entry-ruler-line {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgb(166 139 130 / 34%);
+}
+
+.entry-ruler-ticks {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.entry-ruler-tick-slot {
+  display: flex;
+  justify-content: center;
+}
+
+.entry-ruler-tick {
+  width: 1px;
+  height: 9px;
+  background: rgb(166 139 130 / 46%);
+}
+
+.entry-needle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(calc(var(--dial-index, 0) * 100%));
+}
+
+.entry-needle.is-armed {
+  transition:
+    transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 260ms ease;
+}
+
+.entry-needle.is-visible {
+  opacity: 1;
+}
+
+.entry-needle span {
+  width: 1px;
+  height: 22px;
+  background: var(--primary-strong);
+}
+
+.entry-mood-line {
+  height: 28px;
+  margin: 1.125rem 0 0;
+  text-align: center;
+  font-family: "Instrument Serif", "Cormorant Garamond", serif;
+  font-style: normal;
+  font-weight: 100;
+  font-size: 0.94rem;
+  line-height: 1.81;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-main);
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.entry-mood-line.is-visible {
+  opacity: 0.55;
 }
 
 .entry-footer {
@@ -1421,6 +1558,43 @@ body {
   .mood-button {
     min-height: 48px;
     padding: 0.5rem 0.2rem 0.5rem 0.1rem;
+  }
+
+  .dial-mood {
+    gap: 0.35rem;
+    padding: 0.5rem 0.2rem 0.75rem;
+  }
+
+  .dial-mood-name {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+    font-size: 0.66rem;
+  }
+
+  .dial-mood.is-active .dial-mood-name {
+    font-size: 0.72rem;
+  }
+
+  .dial-mood-hint {
+    display: none;
+  }
+
+  .entry-ruler {
+    height: 22px;
+  }
+
+  .entry-ruler-tick {
+    height: 7px;
+  }
+
+  .entry-needle span {
+    height: 18px;
+  }
+
+  .entry-mood-line {
+    margin-top: 0.85rem;
+    font-size: 0.82rem;
   }
 }
 
