@@ -6,6 +6,7 @@ export default function AppHeader({
   showSearch = false,
   searchValue = '',
   searchPlaceholder = '오늘, 어떤 온도의 음악을 들을까요?',
+  searchAriaLabel = 'Search music',
   onSearchChange,
   onSearchSubmit,
 }) {
@@ -35,11 +36,6 @@ export default function AppHeader({
             <Link to="/room" className={active === 'room' ? 'active' : ''}>
               Room
             </Link>
-            <Link to="/search" className={active === 'search' ? 'active' : ''}>
-              Browse
-            </Link>
-            <a href="#">Radio</a>
-            <a href="#">Library</a>
           </nav>
         </div>
 
@@ -52,7 +48,7 @@ export default function AppHeader({
                 value={searchValue}
                 onChange={onSearchChange}
                 placeholder={searchPlaceholder}
-                aria-label="Search music"
+                aria-label={searchAriaLabel}
               />
             </form>
           ) : null}
