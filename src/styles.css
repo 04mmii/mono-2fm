@@ -233,7 +233,7 @@ body {
 /* 페이지 자체는 스크롤되지 않는다. 화면이 너무 낮을 때만 이 블록이 스크롤된다. */
 .track-info {
   width: 100%;
-  max-width: 560px;
+  max-width: 880px;
   max-height: 100%;
   overflow-y: auto;
   display: flex;
@@ -251,7 +251,7 @@ body {
 .track-title {
   margin: 0 0 0.75rem;
   font-family: "Playfair Display", serif;
-  font-size: clamp(2rem, min(7.5vw, 7vh), 5.5rem);
+  font-size: clamp(2.75rem, min(9.5vw, 14vh), 8rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
   text-wrap: balance;
@@ -1167,6 +1167,11 @@ body {
   margin-top: 0;
   margin-bottom: 0;
   text-align: center;
+}
+
+/* 대문자로 조판된 줄 안에서도 워드마크는 브랜드 표기를 지킨다. */
+.brand-word {
+  text-transform: none;
 }
 
 .entry-kicker {

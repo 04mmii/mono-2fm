@@ -149,7 +149,7 @@ export default function EntryPage() {
         <main className="entry-main">
           <section className="entry-hero" aria-label="Mood selection hero">
             <div className="entry-content">
-              <p className="entry-kicker">MONO.FM LISTENING ROOM</p>
+              <p className="entry-kicker"><span className="brand-word">MONO.fm</span> LISTENING ROOM</p>
               <h1>How do you feel right now?</h1>
               <p className="entry-subtitle">
                 지금의 기분을 건네주세요. <br />
@@ -213,7 +213,7 @@ export default function EntryPage() {
             <a href="#">Spotify</a>
             <a href="#">Contact</a>
           </div>
-          <p>© 2024 MONO.FM — CRAFTED FOR THE SOUL</p>
+          <p>© 2024 <span className="brand-word">MONO.fm</span> — CRAFTED FOR THE SOUL</p>
         </footer>
 
         <button type="button" className="entry-volume" aria-label="Volume">
