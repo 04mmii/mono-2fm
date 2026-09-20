@@ -233,7 +233,7 @@ body {
 /* 페이지 자체는 스크롤되지 않는다. 화면이 너무 낮을 때만 이 블록이 스크롤된다. */
 .track-info {
   width: 100%;
-  max-width: 560px;
+  max-width: 760px;
   max-height: 100%;
   overflow-y: auto;
   display: flex;
@@ -251,8 +251,8 @@ body {
 .track-title {
   margin: 0 0 0.75rem;
   font-family: "Playfair Display", serif;
-  font-size: clamp(1.375rem, min(2.2vw, 3.2vh), 2rem);
-  line-height: 1.1;
+  font-size: clamp(2rem, min(4.5vw, 6.6vh), 4rem);
+  line-height: 1.05;
   letter-spacing: -0.03em;
   text-wrap: balance;
   text-shadow: 0 3px 16px rgb(47 42 36 / 8%);
@@ -264,7 +264,7 @@ body {
 
 .artist-name {
   margin: 0 0 clamp(1.25rem, 4vh, 3rem);
-  font-size: clamp(0.85rem, min(1.15vw, 1.7vh), 1.05rem);
+  font-size: clamp(0.95rem, min(1.45vw, 2.1vh), 1.3rem);
   font-style: italic;
   font-weight: 300;
 }
