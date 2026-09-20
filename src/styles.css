@@ -1191,15 +1191,8 @@ body {
   letter-spacing: -0.012em;
   font-weight: 400;
   white-space: nowrap;
-  width: auto;
   max-width: 100%;
-  display: inline-block;
-  position: relative;
-  left: 50%;
-  margin-left: 0;
-  margin-right: 0;
   text-align: center;
-  transform: translateX(calc(-50% - 0.12em));
   color: var(--text-main);
   text-shadow: 0 10px 26px rgb(50 37 25 / 9%);
 }
