@@ -88,9 +88,16 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'mood is required' })
   }
 
+  // ?debug=1 일 때만 왜 실패했는지 자세히 알려준다. 평소에는 이유 코드만.
+  const debug = 'debug' in (req.query || {})
+
   if (!process.env.ANTHROPIC_API_KEY) {
     console.log('No ANTHROPIC_API_KEY, using retro fallback')
-    return res.status(200).json({ ...fallbackForMood(mood), source: 'fallback' })
+    return res.status(200).json({
+      ...fallbackForMood(mood),
+      source: 'fallback',
+      fallbackReason: 'no_api_key',
+    })
   }
 
   try {
@@ -98,6 +105,18 @@ export default async function handler(req, res) {
     return res.status(200).json({ ...recommendation, source: 'claude' })
   } catch (error) {
     console.error('Claude recommendation failed, using fallback:', error)
-    return res.status(200).json({ ...fallbackForMood(mood), source: 'fallback' })
+    return res.status(200).json({
+      ...fallbackForMood(mood),
+      source: 'fallback',
+      fallbackReason: 'ai_error',
+      ...(debug
+        ? {
+            // 키 값은 에러 메시지에 실리지 않는다.
+            errorName: error?.name ?? null,
+            errorStatus: error?.status ?? null,
+            errorMessage: String(error?.message ?? '').slice(0, 200),
+          }
+        : {}),
+    })
   }
 }
