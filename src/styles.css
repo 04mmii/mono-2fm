@@ -251,7 +251,7 @@ body {
 .track-title {
   margin: 0 0 0.75rem;
   font-family: "Playfair Display", serif;
-  font-size: clamp(2.75rem, min(9.5vw, 14vh), 8rem);
+  font-size: clamp(2.5rem, min(8.25vw, 12vh), 6.75rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
   text-wrap: balance;
