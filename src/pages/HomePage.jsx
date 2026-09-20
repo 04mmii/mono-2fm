@@ -28,7 +28,7 @@ function getDuration(track) {
 
 export default function HomePage() {
   const location = useLocation()
-  const { currentTrack, isPlaying, toggle, setTrack, setQueue, nextTrack } = usePlayer()
+  const { currentTrack, isPlaying, toggle, play, setTrack, setQueue, nextTrack } = usePlayer()
   const [inputValue, setInputValue] = useState('')
   const [curation, setCuration] = useState(null)
   const [isCurating, setIsCurating] = useState(true)
@@ -45,6 +45,9 @@ export default function HomePage() {
   // setQueue/setTrack은 호출할 때마다 identity가 바뀌므로,
   // 같은 무드에 대해서는 effect 본문이 다시 돌지 않도록 막는다.
   const loadedMoodRef = useRef(null)
+
+  // 무드를 고르는 행위 자체가 재생 의사다. 큐가 준비되면 바로 튼다.
+  const autoPlayRef = useRef(true)
 
   useEffect(() => {
     if (loadedMoodRef.current === mood) return
@@ -85,6 +88,7 @@ export default function HomePage() {
         setQueue(tracks)
         if (tracks.length > 0) {
           setTrack(tracks[0])
+          autoPlayRef.current = true
         }
       } catch {
         if (!active) return
@@ -100,12 +104,22 @@ export default function HomePage() {
     }
   }, [mood, setQueue, setTrack])
 
+  // 큐와 현재 곡이 실제로 세팅된 뒤에 재생을 시작한다. load() 안에서 바로 play()를
+  // 부르면 아직 반영되지 않은 빈 큐를 보고 큐를 덮어써 버린다.
+  useEffect(() => {
+    if (!autoPlayRef.current) return
+    if (!currentTrack) return
+    autoPlayRef.current = false
+    play()
+  }, [currentTrack, play])
+
   // 헤더 입력창은 검색이 아니라 "무드 다시 말하기"다.
   // 제출하면 mood state가 바뀌고, 무드가 바뀔 때 도는 추천 파이프라인이 그대로 다시 돈다.
   const onSubmitMood = (event) => {
     event.preventDefault()
     const nextMood = inputValue.trim()
     if (!nextMood) return
+    autoPlayRef.current = true
     setMood(nextMood)
     setInputValue('')
   }
