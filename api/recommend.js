@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { fallbackForMood } from '../src/lib/moodFallback.js'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -34,46 +35,6 @@ iTunes Search API용 영어 검색어를 하나 만들어주세요.
   "playlistMood": "플레이리스트 분위기 한 줄(한국어)"
 }`
 
-// 무드별 레트로 폴백 (API 키가 없거나 호출이 실패했을 때 사용)
-const FALLBACKS = {
-  'quiet afternoon': {
-    query: 'city pop 1980s',
-    reason: '나른한 오후엔 창가로 스미는 80년대 시티팝의 햇살이 어울려요.',
-    playlistMood: '햇살이 길게 눕는 오후의 시티팝',
-  },
-  'slow rain': {
-    query: 'vintage jazz standards',
-    reason: '빗소리 위로는 오래된 재즈 스탠다드의 브러시 드럼이 가장 잘 얹혀요.',
-    playlistMood: '빗방울을 세는 빈티지 재즈',
-  },
-  'warm tape': {
-    query: '70s soul',
-    reason: '카세트테이프의 따뜻한 히스에는 70년대 소울의 두툼한 온기가 제격이에요.',
-    playlistMood: '테이프에 눌러 담은 70년대 소울',
-  },
-  'late night room': {
-    query: '80s synth pop',
-    reason: '불 꺼진 방의 새벽엔 80년대 아날로그 신스의 차가운 잔향이 남아요.',
-    playlistMood: '새벽 방 안을 채우는 80년대 신스팝',
-  },
-  'faded memory': {
-    query: 'oldies love songs',
-    reason: '바래버린 기억에는 오래된 러브송의 흐릿한 코러스가 겹쳐집니다.',
-    playlistMood: '색이 바랜 올디스 러브송',
-  },
-}
-
-const DEFAULT_FALLBACK = {
-  query: 'city pop 1980s',
-  reason: '어떤 온도에도 무난하게 어울리는 레트로 시티팝으로 시작해요.',
-  playlistMood: '턴테이블 위에서 도는 레트로 감성',
-}
-
-function getFallback(mood) {
-  const key = String(mood || '').trim().toLowerCase()
-  return FALLBACKS[key] || DEFAULT_FALLBACK
-}
-
 async function getAIRecommendation(mood) {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-5-20250929',
@@ -97,7 +58,7 @@ async function getAIRecommendation(mood) {
     throw new Error('Claude response has no query')
   }
 
-  const fallback = getFallback(mood)
+  const fallback = fallbackForMood(mood)
   return {
     query: String(parsed.query),
     reason: parsed.reason ? String(parsed.reason) : fallback.reason,
@@ -129,7 +90,7 @@ export default async function handler(req, res) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     console.log('No ANTHROPIC_API_KEY, using retro fallback')
-    return res.status(200).json({ ...getFallback(mood), source: 'fallback' })
+    return res.status(200).json({ ...fallbackForMood(mood), source: 'fallback' })
   }
 
   try {
@@ -137,6 +98,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ...recommendation, source: 'claude' })
   } catch (error) {
     console.error('Claude recommendation failed, using fallback:', error)
-    return res.status(200).json({ ...getFallback(mood), source: 'fallback' })
+    return res.status(200).json({ ...fallbackForMood(mood), source: 'fallback' })
   }
 }

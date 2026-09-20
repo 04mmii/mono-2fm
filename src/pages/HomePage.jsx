@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import { searchTracks } from '../lib/musicApi'
+import { fallbackForMood } from '../lib/moodFallback'
 import { usePlayer } from '../player/PlayerProvider'
 
-const FALLBACK_QUERY = 'city pop 1980s'
 
 function getTitle(track) {
   return track?.title || track?.name || track?.trackName || 'No track selected'
@@ -57,8 +57,10 @@ export default function HomePage() {
     setIsCurating(true)
 
     const load = async () => {
-      let query = FALLBACK_QUERY
-      let note = null
+      // AI가 닿지 않아도 무드에 맞는 검색어가 나오도록 규칙 기반 폴백을 먼저 깔아둔다.
+      const fallback = fallbackForMood(mood)
+      let query = fallback.query
+      let note = { reason: fallback.reason, playlistMood: fallback.playlistMood }
 
       // 1. Claude가 무드를 읽고 레트로 검색어를 만들어준다.
       try {
@@ -74,8 +76,9 @@ export default function HomePage() {
           note = { reason: data.reason || '', playlistMood: data.playlistMood || '' }
         }
       } catch {
-        // AI 호출이 실패해도 레트로 기본 검색어로 재생은 이어간다.
-        query = FALLBACK_QUERY
+        // AI 호출이 실패해도 무드에 맞는 폴백 검색어로 재생은 이어간다.
+        query = fallback.query
+        note = { reason: fallback.reason, playlistMood: fallback.playlistMood }
       }
 
       if (!active) return
