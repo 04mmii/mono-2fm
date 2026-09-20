@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
+import { usePlayer } from '../player/PlayerProvider'
 
 // hint / line 값은 api/recommend.js의 FALLBACKS에 있는 query / playlistMood와 같다.
 // hue / sat / lift는 무드에 따라 배경 색온도를 미세하게 미는 오프셋이다.
@@ -52,6 +53,9 @@ const NEUTRAL = { hue: 0, sat: 0, lift: 0 }
 export default function EntryPage() {
   const navigate = useNavigate()
   const pageRef = useRef(null)
+
+  // 엔트리로 돌아와도 오디오는 계속 흐른다. 여기서도 멈출 수 있게 한다.
+  const { currentTrack, isPlaying, toggle } = usePlayer()
   const moodTargetRef = useRef(NEUTRAL)
 
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -289,9 +293,37 @@ export default function EntryPage() {
           <p>© 2024 <span className="brand-word">MONO.fm</span> — CRAFTED FOR THE SOUL</p>
         </footer>
 
-        <button type="button" className="entry-volume" aria-label="Volume">
-          🔊
-        </button>
+        {currentTrack ? (
+          <button
+            type="button"
+            className={`entry-sound${isPlaying ? ' is-playing' : ''}`}
+            onClick={toggle}
+            aria-label={isPlaying ? '음악 멈추기' : '음악 다시 켜기'}
+            title={isPlaying ? '음악 멈추기' : '음악 다시 켜기'}
+          >
+            {isPlaying ? (
+              <svg width="19" height="19" viewBox="0 0 18 18" fill="none" aria-hidden>
+                <path d="M3 6.8h2.6L9.2 3.8v10.4L5.6 11.2H3z" fill="currentColor" />
+                <path
+                  d="M12 6.3a3.7 3.7 0 0 1 0 5.4M14.2 4.4a6.6 6.6 0 0 1 0 9.2"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : (
+              <svg width="19" height="19" viewBox="0 0 18 18" fill="none" aria-hidden>
+                <path d="M3 6.8h2.6L9.2 3.8v10.4L5.6 11.2H3z" fill="currentColor" />
+                <path
+                  d="m12 7 4 4M16 7l-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+          </button>
+        ) : null}
       </div>
       <div className="entry-felt-overlay" aria-hidden />
     </div>

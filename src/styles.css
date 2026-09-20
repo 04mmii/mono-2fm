@@ -1514,25 +1514,52 @@ body {
   color: rgb(124 116 104 / 66%);
 }
 
-.entry-volume {
+/* 엔트리에서도 재생 중인 소리를 멈출 수 있다. 재생 중이면 채운 원,
+   멈춘 상태면 테두리만. 검정 대신 팔레트의 따뜻한 토프를 쓴다. */
+.entry-sound {
   position: fixed;
   right: 1.4rem;
   bottom: 1.4rem;
   width: 52px;
   height: 52px;
-  border: 0;
+  border: 1px solid var(--primary-strong);
   border-radius: 50%;
-  background: var(--text-main);
-  color: var(--bg);
-  font-size: 1rem;
+  background: transparent;
+  color: var(--primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgb(47 42 36 / 22%);
-  transition: transform 160ms ease;
+  box-shadow: 0 8px 20px rgb(143 128 106 / 20%);
+  transition:
+    transform 160ms ease,
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
   z-index: 5;
 }
 
-.entry-volume:hover {
+.entry-sound.is-playing {
+  background: var(--primary-strong);
+  color: var(--bg);
+}
+
+.entry-sound:hover {
   transform: scale(1.04);
+}
+
+.entry-sound:not(.is-playing):hover {
+  background: rgb(143 128 106 / 12%);
+}
+
+.entry-sound.is-playing:hover {
+  background: var(--primary);
+  box-shadow: 0 10px 24px rgb(143 128 106 / 30%);
+}
+
+.entry-sound:focus-visible {
+  outline: 2px solid var(--primary-strong);
+  outline-offset: 3px;
 }
 
 .entry-felt-overlay {
