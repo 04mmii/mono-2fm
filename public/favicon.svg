@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="MONO.fm">
+  <defs>
+    <radialGradient id="sheen" cx="34%" cy="28%" r="62%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- record -->
+  <circle cx="16" cy="16" r="15.5" fill="#2f2a24"/>
+  <!-- rim: keeps the disc's silhouette readable on dark tab bars -->
+  <circle cx="16" cy="16" r="15.1" fill="none" stroke="#9f9380" stroke-opacity="0.55" stroke-width="0.9"/>
+
+  <!-- grooves -->
+  <g fill="none" stroke="#efede3" stroke-opacity="0.16">
+    <circle cx="16" cy="16" r="12.6" stroke-width="0.7"/>
+    <circle cx="16" cy="16" r="10.5" stroke-width="0.7"/>
+    <circle cx="16" cy="16" r="8.5" stroke-width="0.7"/>
+  </g>
+
+  <circle cx="16" cy="16" r="15.5" fill="url(#sheen)"/>
+
+  <!-- label -->
+  <circle cx="16" cy="16" r="5.4" fill="#9f9380"/>
+  <circle cx="16" cy="16" r="5.4" fill="none" stroke="#2f2a24" stroke-opacity="0.35" stroke-width="0.5"/>
+
+  <!-- spindle hole -->
+  <circle cx="16" cy="16" r="1.5" fill="#efede3"/>
+</svg>
