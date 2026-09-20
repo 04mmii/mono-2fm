@@ -1366,6 +1366,120 @@ body {
   opacity: 0.55;
 }
 
+/* 목록에 없는 기분을 직접 적는 입구. 평소엔 동그란 물음표로만 있다가
+   호버/포커스하면 안내가 펼쳐지고, 누르면 입력창으로 바뀐다. */
+.entry-ask {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 1.5rem 0.55rem;
+  position: relative;
+  z-index: 2;
+}
+
+.entry-ask-btn {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.entry-ask-mark {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgb(166 139 130 / 34%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Instrument Serif", "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1;
+  transition:
+    border-color 220ms ease,
+    color 220ms ease,
+    background-color 220ms ease;
+}
+
+.entry-ask-label {
+  max-width: 0;
+  margin-left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  transition:
+    max-width 320ms ease,
+    margin-left 320ms ease,
+    opacity 240ms ease;
+}
+
+.entry-ask-btn:hover,
+.entry-ask-btn:focus-visible {
+  outline: none;
+  color: var(--text-main);
+}
+
+.entry-ask-btn:hover .entry-ask-mark,
+.entry-ask-btn:focus-visible .entry-ask-mark {
+  border-color: rgb(159 147 128 / 56%);
+  background: rgb(244 241 232 / 30%);
+}
+
+.entry-ask-btn:hover .entry-ask-label,
+.entry-ask-btn:focus-visible .entry-ask-label {
+  max-width: 260px;
+  margin-left: 0.7rem;
+  opacity: 1;
+}
+
+.entry-ask-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(100%, 320px);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgb(159 147 128 / 46%);
+}
+
+.entry-ask-form input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--text-main);
+}
+
+.entry-ask-form input::placeholder {
+  color: rgb(124 116 104 / 58%);
+}
+
+.entry-ask-go {
+  flex: none;
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary-strong);
+  cursor: pointer;
+  transition: transform 180ms ease;
+}
+
+.entry-ask-go:hover {
+  transform: translateX(2px);
+}
+
 .entry-footer {
   display: flex;
   flex-direction: column;
@@ -1545,6 +1659,13 @@ body {
   .entry-mood-line {
     margin-top: 0.85rem;
     font-size: 0.82rem;
+  }
+
+  /* 터치 기기엔 호버가 없다. 안내를 처음부터 펼쳐 둔다. */
+  .entry-ask-label {
+    max-width: 260px;
+    margin-left: 0.6rem;
+    opacity: 0.85;
   }
 }
 

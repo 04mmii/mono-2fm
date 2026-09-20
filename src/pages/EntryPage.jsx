@@ -58,6 +58,11 @@ export default function EntryPage() {
   const [lastIndex, setLastIndex] = useState(0)
   const [armed, setArmed] = useState(false)
 
+  // 5개 무드 밖의 기분을 직접 적어 넣는 입구
+  const [asking, setAsking] = useState(false)
+  const [askValue, setAskValue] = useState('')
+  const askInputRef = useRef(null)
+
   const enterRoom = (mood) => {
     navigate('/room', { state: { mood } })
   }
@@ -69,6 +74,30 @@ export default function EntryPage() {
     setLastIndex(index)
     setArmed(true)
     moodTargetRef.current = { hue: mood.hue, sat: mood.sat, lift: mood.lift }
+  }
+
+  const openAsk = () => {
+    setAsking(true)
+  }
+
+  // 입력창이 DOM에 올라온 뒤에 포커스를 준다.
+  useEffect(() => {
+    if (asking) askInputRef.current?.focus()
+  }, [asking])
+
+  const closeAsk = () => {
+    setAsking(false)
+    setAskValue('')
+  }
+
+  const submitAsk = (event) => {
+    event.preventDefault()
+    const mood = askValue.trim()
+    if (!mood) {
+      closeAsk()
+      return
+    }
+    enterRoom(mood)
   }
 
   const blurMood = () => {
@@ -205,6 +234,50 @@ export default function EntryPage() {
             </div>
           </section>
         </main>
+
+        <div className="entry-ask">
+          {asking ? (
+            <form className="entry-ask-form" onSubmit={submitAsk}>
+              <input
+                ref={askInputRef}
+                type="text"
+                value={askValue}
+                onChange={(e) => setAskValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') closeAsk()
+                }}
+                onBlur={() => {
+                  if (!askValue.trim()) closeAsk()
+                }}
+                placeholder="예: 눈 오는 겨울 밤"
+                aria-label="다른 기분 적기"
+              />
+              <button type="submit" className="entry-ask-go" aria-label="이 기분으로 듣기">
+                <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden>
+                  <path
+                    d="M2.6 7h8.2M7.6 3.6 11 7l-3.4 3.4"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="entry-ask-btn"
+              onClick={openAsk}
+              aria-label="목록에 없는 기분 적기"
+            >
+              <span className="entry-ask-mark" aria-hidden>
+                ?
+              </span>
+              <span className="entry-ask-label">또 다른 기분을 알려주세요</span>
+            </button>
+          )}
+        </div>
 
         <footer className="entry-footer">
           <div className="entry-line" />
