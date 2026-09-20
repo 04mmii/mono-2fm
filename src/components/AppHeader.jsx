@@ -16,7 +16,7 @@ export default function AppHeader({
         <header className="mono-header entry-only" data-purpose="main-nav">
           <Link to="/entry" className="brand">
             <span className="brand-icon">◉</span>
-            <h1>Mono.fm</h1>
+            <h1>MONO.fm</h1>
           </Link>
         </header>
       </div>
@@ -29,7 +29,7 @@ export default function AppHeader({
         <div className="left-nav">
           <Link to="/entry" className="brand">
             <span className="brand-icon">◉</span>
-            <h1>Mono.fm</h1>
+            <h1>MONO.fm</h1>
           </Link>
 
           <nav className={variant === 'search' ? 'nav-links' : 'main-nav'} aria-label="Primary">
