@@ -35,6 +35,27 @@ iTunes Search API용 영어 검색어를 하나 만들어주세요.
   "playlistMood": "플레이리스트 분위기 한 줄(한국어)"
 }`
 
+// Claude가 JSON만 달라는 지시를 어기고 ```json 펜스로 감싸거나 앞뒤에 문장을
+// 붙이는 경우가 있다. 프롬프트만 믿지 말고 파싱 쪽에서 흡수한다.
+function parseLooseJson(text) {
+  let body = String(text ?? '').trim()
+
+  const fenced = body.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i)
+  if (fenced) body = fenced[1].trim()
+
+  try {
+    return JSON.parse(body)
+  } catch {
+    // 앞뒤에 설명이 붙은 경우: 첫 '{' 부터 마지막 '}' 까지만 떼어본다.
+    const start = body.indexOf('{')
+    const end = body.lastIndexOf('}')
+    if (start !== -1 && end > start) {
+      return JSON.parse(body.slice(start, end + 1))
+    }
+    throw new Error('Claude 응답에서 JSON 객체를 찾지 못했습니다')
+  }
+}
+
 async function getAIRecommendation(mood) {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-5-20250929',
@@ -53,7 +74,7 @@ async function getAIRecommendation(mood) {
     throw new Error('No text response from Claude')
   }
 
-  const parsed = JSON.parse(textBlock.text)
+  const parsed = parseLooseJson(textBlock.text)
   if (!parsed?.query) {
     throw new Error('Claude response has no query')
   }
